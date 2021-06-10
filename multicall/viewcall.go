@@ -32,7 +32,7 @@ func NewViewCall(id, target, method string, arguments []interface{}) ViewCall {
 }
 
 func (call ViewCall) Validate() error {
-	if _, err := call.argsCallData(); err != nil {
+	if _, err := call.ArgsCallData(); err != nil {
 		return err
 	}
 	return nil
@@ -41,7 +41,7 @@ func (call ViewCall) Validate() error {
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
-func (call ViewCall) argumentTypes() []string {
+func (call ViewCall) ArgumentTypes() []string {
 	rawArgs := insideParens.FindAllString(call.method, -1)[0]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
@@ -55,7 +55,7 @@ func (call ViewCall) argumentTypes() []string {
 	return args
 }
 
-func (call ViewCall) returnTypes() []string {
+func (call ViewCall) ReturnTypes() []string {
 	rawArgs := insideParens.FindAllString(call.method, -1)[1]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
@@ -67,11 +67,11 @@ func (call ViewCall) returnTypes() []string {
 }
 
 func (call ViewCall) CallData() ([]byte, error) {
-	argsSuffix, err := call.argsCallData()
+	argsSuffix, err := call.ArgsCallData()
 	if err != nil {
 		return nil, err
 	}
-	methodPrefix, err := call.methodCallData()
+	methodPrefix, err := call.MethodCallData()
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (call ViewCall) CallData() ([]byte, error) {
 	return payload, nil
 }
 
-func (call ViewCall) methodCallData() ([]byte, error) {
+func (call ViewCall) MethodCallData() ([]byte, error) {
 	methodParts := strings.Split(call.method, ")(")
 	var method string
 	if len(methodParts) > 1 {
@@ -95,8 +95,8 @@ func (call ViewCall) methodCallData() ([]byte, error) {
 	return hash[0:4], nil
 }
 
-func (call ViewCall) argsCallData() ([]byte, error) {
-	argTypes := call.argumentTypes()
+func (call ViewCall) ArgsCallData() ([]byte, error) {
+	argTypes := call.ArgumentTypes()
 	if len(argTypes) != len(call.arguments) {
 		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.id, call.method)
 	}
@@ -110,7 +110,7 @@ func (call ViewCall) argsCallData() ([]byte, error) {
 		}
 
 		arguments[index] = abi.Argument{Type: argType}
-		argumentValues[index], err = call.getArgument(index, argTypeStr)
+		argumentValues[index], err = call.GetArgument(index, argTypeStr)
 		if err != nil {
 			return nil, err
 		}
@@ -119,7 +119,7 @@ func (call ViewCall) argsCallData() ([]byte, error) {
 	return arguments.Pack(argumentValues...)
 }
 
-func (call ViewCall) getArgument(index int, argumentType string) (interface{}, error) {
+func (call ViewCall) GetArgument(index int, argumentType string) (interface{}, error) {
 	arg := call.arguments[index]
 	if argumentType == "address" {
 		address, ok := arg.(string)
@@ -153,8 +153,8 @@ func (call ViewCall) getArgument(index int, argumentType string) (interface{}, e
 	return arg, nil
 }
 
-func (call ViewCall) decode(raw []byte) ([]interface{}, error) {
-	retTypes := call.returnTypes()
+func (call ViewCall) Decode(raw []byte) ([]interface{}, error) {
+	retTypes := call.ReturnTypes()
 	args := make(abi.Arguments, 0, 0)
 	for index, retTypeStr := range retTypes {
 		retType, err := abi.NewType(retTypeStr, "", nil)
@@ -228,7 +228,7 @@ type wrapperRet struct {
 	Returns     []retType
 }
 
-func (calls ViewCalls) decodeWrapper(raw string) (*wrapperRet, error) {
+func (calls ViewCalls) DecodeWrapper(raw string) (*wrapperRet, error) {
 	rawBytes, err := hex.DecodeString(strings.Replace(raw, "0x", "", -1))
 	if err != nil {
 		return nil, err
@@ -274,8 +274,8 @@ func (calls ViewCalls) decodeWrapper(raw string) (*wrapperRet, error) {
 	return decoded, err
 }
 
-func (calls ViewCalls) decodeRaw(raw string) (*Result, error) {
-	decoded, err := calls.decodeWrapper(raw)
+func (calls ViewCalls) DecodeRaw(raw string) (*Result, error) {
+	decoded, err := calls.DecodeWrapper(raw)
 	if err != nil {
 		return nil, err
 	}
@@ -295,8 +295,8 @@ func (calls ViewCalls) decodeRaw(raw string) (*Result, error) {
 	return result, nil
 }
 
-func (calls ViewCalls) decode(raw string) (*Result, error) {
-	decoded, err := calls.decodeWrapper(raw)
+func (calls ViewCalls) Decode(raw string) (*Result, error) {
+	decoded, err := calls.DecodeWrapper(raw)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (calls ViewCalls) decode(raw string) (*Result, error) {
 			Raw:     decoded.Returns[index].Data,
 		}
 		if decoded.Returns[index].Success {
-			returnValues, err := call.decode(decoded.Returns[index].Data)
+			returnValues, err := call.Decode(decoded.Returns[index].Data)
 			if err != nil {
 				return nil, err
 			}

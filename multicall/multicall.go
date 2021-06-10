@@ -50,7 +50,7 @@ func (mc multicall) CallRaw(calls ViewCalls, block string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return calls.decodeRaw(resultRaw)
+	return calls.DecodeRaw(resultRaw)
 }
 
 func (mc multicall) Call(calls ViewCalls, block string) (*Result, error) {
@@ -58,7 +58,7 @@ func (mc multicall) Call(calls ViewCalls, block string) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return calls.decode(resultRaw)
+	return calls.Decode(resultRaw)
 }
 
 func (mc multicall) makeRequest(calls ViewCalls, block string) (string, error) {

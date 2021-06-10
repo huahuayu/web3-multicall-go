@@ -23,7 +23,7 @@ func TestViewCall(t *testing.T) {
 		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 		0x0, 0x0, 0x0, 0xc}
-	assert.Equal(t, expectedArgTypes, vc.argumentTypes())
+	assert.Equal(t, expectedArgTypes, vc.ArgumentTypes())
 	callData, err := vc.CallData()
 	assert.Nil(t, err)
 	assert.Equal(t, expectedCallData, callData)
@@ -56,8 +56,8 @@ func TestEncodeNumericArgument(t *testing.T) {
 		arguments: []interface{}{12312312312313},
 	}
 
-	data1, err1 := vc1.argsCallData()
-	data2, err2 := vc2.argsCallData()
+	data1, err1 := vc1.ArgsCallData()
+	data2, err2 := vc2.ArgsCallData()
 	assert.Nil(t, err1)
 	assert.Nil(t, err2)
 	assert.Equal(t, data1, data2)
@@ -73,6 +73,6 @@ func TestEncodeBytes32Argument(t *testing.T) {
 		arguments: []interface{}{bytes32Array, "12312312312313"},
 	}
 
-	_, err1 := vc1.argsCallData()
+	_, err1 := vc1.ArgsCallData()
 	assert.Nil(t, err1)
 }
