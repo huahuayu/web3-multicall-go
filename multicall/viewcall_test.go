@@ -24,7 +24,7 @@ func TestViewCall(t *testing.T) {
 		0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,
 		0x0, 0x0, 0x0, 0xc}
 	assert.Equal(t, expectedArgTypes, vc.argumentTypes())
-	callData, err := vc.callData()
+	callData, err := vc.CallData()
 	assert.Nil(t, err)
 	assert.Equal(t, expectedCallData, callData)
 }

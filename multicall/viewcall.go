@@ -66,7 +66,7 @@ func (call ViewCall) returnTypes() []string {
 	return args
 }
 
-func (call ViewCall) callData() ([]byte, error) {
+func (call ViewCall) CallData() ([]byte, error) {
 	argsSuffix, err := call.argsCallData()
 	if err != nil {
 		return nil, err
@@ -186,10 +186,10 @@ type callArgs struct {
 	CallData []byte
 }
 
-func (calls ViewCalls) callData() ([]byte, error) {
+func (calls ViewCalls) CallData() ([]byte, error) {
 	payloadArgs := make([]callArgs, 0, len(calls))
 	for _, call := range calls {
-		callData, err := call.callData()
+		callData, err := call.CallData()
 		if err != nil {
 			return nil, err
 		}

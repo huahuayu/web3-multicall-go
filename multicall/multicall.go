@@ -62,7 +62,7 @@ func (mc multicall) Call(calls ViewCalls, block string) (*Result, error) {
 }
 
 func (mc multicall) makeRequest(calls ViewCalls, block string) (string, error) {
-	payloadArgs, err := calls.callData()
+	payloadArgs, err := calls.CallData()
 	if err != nil {
 		return "", err
 	}
