@@ -7,10 +7,10 @@ import (
 
 func TestViewCall(t *testing.T) {
 	vc := ViewCall{
-		id:        "key",
-		target:    "0x0",
-		method:    "balanceOf(address, uint64)(int256)",
-		arguments: []interface{}{"0x1234", uint64(12)},
+		Id:        "key",
+		Target:    "0x0",
+		Method:    "balanceOf(address, uint64)(int256)",
+		Arguments: []interface{}{"0x1234", uint64(12)},
 	}
 	expectedArgTypes := []string{"address", "uint64"}
 	expectedCallData := []byte{
@@ -31,10 +31,10 @@ func TestViewCall(t *testing.T) {
 
 func TestCatchPanicOnInterfaceIssue(t *testing.T) {
 	vc := ViewCall{
-		id:        "key",
-		target:    "0x0",
-		method:    "balanceOf(address)(int256)",
-		arguments: []interface{}{1234},
+		Id:        "key",
+		Target:    "0x0",
+		Method:    "balanceOf(address)(int256)",
+		Arguments: []interface{}{1234},
 	}
 
 	err := vc.Validate()
@@ -44,16 +44,16 @@ func TestCatchPanicOnInterfaceIssue(t *testing.T) {
 
 func TestEncodeNumericArgument(t *testing.T) {
 	vc1 := ViewCall{
-		id:        "key",
-		target:    "0x0",
-		method:    "balanceOf(uint256)(int256)",
-		arguments: []interface{}{"12312312312313"},
+		Id:        "key",
+		Target:    "0x0",
+		Method:    "balanceOf(uint256)(int256)",
+		Arguments: []interface{}{"12312312312313"},
 	}
 	vc2 := ViewCall{
-		id:        "key",
-		target:    "0x0",
-		method:    "balanceOf(uint256)(int256)",
-		arguments: []interface{}{12312312312313},
+		Id:        "key",
+		Target:    "0x0",
+		Method:    "balanceOf(uint256)(int256)",
+		Arguments: []interface{}{12312312312313},
 	}
 
 	data1, err1 := vc1.ArgsCallData()
@@ -67,10 +67,10 @@ func TestEncodeBytes32Argument(t *testing.T) {
 	var bytes32Array = [32]uint8{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 
 	vc1 := ViewCall{
-		id:        "key",
-		target:    "0x0",
-		method:    "balanceOfPartition(bytes32, uint256)(int256)",
-		arguments: []interface{}{bytes32Array, "12312312312313"},
+		Id:        "key",
+		Target:    "0x0",
+		Method:    "balanceOfPartition(bytes32, uint256)(int256)",
+		Arguments: []interface{}{bytes32Array, "12312312312313"},
 	}
 
 	_, err1 := vc1.ArgsCallData()

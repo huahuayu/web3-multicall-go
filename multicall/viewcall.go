@@ -13,20 +13,20 @@ import (
 )
 
 type ViewCall struct {
-	id        string
-	target    string
-	method    string
-	arguments []interface{}
+	Id        string
+	Target    string
+	Method    string
+	Arguments []interface{}
 }
 
 type ViewCalls []ViewCall
 
 func NewViewCall(id, target, method string, arguments []interface{}) ViewCall {
 	return ViewCall{
-		id:        id,
-		target:    target,
-		method:    method,
-		arguments: arguments,
+		Id:        id,
+		Target:    target,
+		Method:    method,
+		Arguments: arguments,
 	}
 
 }
@@ -42,7 +42,7 @@ var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
 func (call ViewCall) ArgumentTypes() []string {
-	rawArgs := insideParens.FindAllString(call.method, -1)[0]
+	rawArgs := insideParens.FindAllString(call.Method, -1)[0]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
 	if rawArgs == "" {
@@ -56,7 +56,7 @@ func (call ViewCall) ArgumentTypes() []string {
 }
 
 func (call ViewCall) ReturnTypes() []string {
-	rawArgs := insideParens.FindAllString(call.method, -1)[1]
+	rawArgs := insideParens.FindAllString(call.Method, -1)[1]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
 	args := strings.Split(rawArgs, ",")
@@ -84,7 +84,7 @@ func (call ViewCall) CallData() ([]byte, error) {
 }
 
 func (call ViewCall) MethodCallData() ([]byte, error) {
-	methodParts := strings.Split(call.method, ")(")
+	methodParts := strings.Split(call.Method, ")(")
 	var method string
 	if len(methodParts) > 1 {
 		method = fmt.Sprintf("%s)", methodParts[0])
@@ -97,11 +97,11 @@ func (call ViewCall) MethodCallData() ([]byte, error) {
 
 func (call ViewCall) ArgsCallData() ([]byte, error) {
 	argTypes := call.ArgumentTypes()
-	if len(argTypes) != len(call.arguments) {
-		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.id, call.method)
+	if len(argTypes) != len(call.Arguments) {
+		return nil, fmt.Errorf("number of argument types doesn't match with number of arguments for %s with method %s", call.Id, call.Method)
 	}
-	argumentValues := make([]interface{}, len(call.arguments))
-	arguments := make(abi.Arguments, len(call.arguments))
+	argumentValues := make([]interface{}, len(call.Arguments))
+	arguments := make(abi.Arguments, len(call.Arguments))
 
 	for index, argTypeStr := range argTypes {
 		argType, err := abi.NewType(argTypeStr, "", nil)
@@ -120,7 +120,7 @@ func (call ViewCall) ArgsCallData() ([]byte, error) {
 }
 
 func (call ViewCall) GetArgument(index int, argumentType string) (interface{}, error) {
-	arg := call.arguments[index]
+	arg := call.Arguments[index]
 	if argumentType == "address" {
 		address, ok := arg.(string)
 		if !ok {
@@ -140,8 +140,8 @@ func (call ViewCall) GetArgument(index int, argumentType string) (interface{}, e
 			argType := reflect.TypeOf(arg)
 			kind := argType.Kind()
 			if kind == reflect.String {
-				if val, ok := new(big.Int).SetString(call.arguments[index].(string), 10); !ok {
-					return nil, fmt.Errorf("could not parse %s as a base 10 number", call.arguments[index])
+				if val, ok := new(big.Int).SetString(call.Arguments[index].(string), 10); !ok {
+					return nil, fmt.Errorf("could not parse %s as a base 10 number", call.Arguments[index])
 				} else {
 					return val, nil
 				}
@@ -193,7 +193,7 @@ func (calls ViewCalls) CallData() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		targetBytes, err := toByteArray(call.target)
+		targetBytes, err := toByteArray(call.Target)
 		if err != nil {
 			return nil, err
 		}
@@ -289,7 +289,7 @@ func (calls ViewCalls) DecodeRaw(raw string) (*Result, error) {
 			Raw:     decoded.Returns[index].Data,
 			Decoded: []interface{}{},
 		}
-		result.Calls[call.id] = callResult
+		result.Calls[call.Id] = callResult
 	}
 
 	return result, nil
@@ -315,7 +315,7 @@ func (calls ViewCalls) Decode(raw string) (*Result, error) {
 			}
 			callResult.Decoded = returnValues
 		}
-		result.Calls[call.id] = callResult
+		result.Calls[call.Id] = callResult
 	}
 
 	return result, nil
