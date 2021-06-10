@@ -1,4 +1,4 @@
-module github.com/alethio/web3-multicall-go
+module github.com/huahuayu/web3-multicall-go
 
 go 1.12
 

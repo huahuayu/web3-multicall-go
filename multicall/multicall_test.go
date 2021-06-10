@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/alethio/web3-go/ethrpc"
 	"github.com/alethio/web3-go/ethrpc/provider/httprpc"
-	"github.com/alethio/web3-multicall-go/multicall"
+	"github.com/huahuayu/web3-multicall-go/multicall"
 	"testing"
 	"time"
 )
