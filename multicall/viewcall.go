@@ -28,7 +28,6 @@ func NewViewCall(id, target, method string, arguments []interface{}) ViewCall {
 		Method:    method,
 		Arguments: arguments,
 	}
-
 }
 
 func (call ViewCall) Validate() error {
@@ -42,7 +41,7 @@ var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
 
 func (call ViewCall) ArgumentTypes() []string {
-	rawArgs := insideParens.FindAllString(call.Method, -1)[0]
+	rawArgs := insideParens.FindAllString(strings.TrimSpace(call.Method), -1)[0]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
 	if rawArgs == "" {
@@ -56,11 +55,14 @@ func (call ViewCall) ArgumentTypes() []string {
 }
 
 func (call ViewCall) ReturnTypes() []string {
-	rawArgs := insideParens.FindAllString(call.Method, -1)[1]
+	rawArgs := insideParens.FindAllString(strings.TrimSpace(call.Method), -1)[1]
 	rawArgs = strings.Replace(rawArgs, "(", "", -1)
 	rawArgs = strings.Replace(rawArgs, ")", "", -1)
 	args := strings.Split(rawArgs, ",")
 	for index, arg := range args {
+		if strings.TrimSpace(arg) == "uint" {
+			arg = "uint256"
+		}
 		args[index] = strings.Trim(arg, " ")
 	}
 	return args
@@ -84,7 +86,7 @@ func (call ViewCall) CallData() ([]byte, error) {
 }
 
 func (call ViewCall) MethodCallData() ([]byte, error) {
-	methodParts := strings.Split(call.Method, ")(")
+	methodParts := strings.Split(strings.ReplaceAll(call.Method, " ", ""), ")(")
 	var method string
 	if len(methodParts) > 1 {
 		method = fmt.Sprintf("%s)", methodParts[0])
@@ -104,6 +106,9 @@ func (call ViewCall) ArgsCallData() ([]byte, error) {
 	arguments := make(abi.Arguments, len(call.Arguments))
 
 	for index, argTypeStr := range argTypes {
+		if strings.TrimSpace(argTypeStr) == "uint" {
+			argTypeStr = "uint256"
+		}
 		argType, err := abi.NewType(argTypeStr, "", nil)
 		if err != nil {
 			return nil, err
