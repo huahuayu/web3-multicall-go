@@ -39,6 +39,7 @@ func (call ViewCall) Validate() error {
 
 var insideParens = regexp.MustCompile("\\(.*?\\)")
 var numericArg = regexp.MustCompile("u?int(256)|(8)")
+var uintMatch = regexp.MustCompile("\\buint\\b")
 
 func (call ViewCall) ArgumentTypes() []string {
 	rawArgs := insideParens.FindAllString(strings.TrimSpace(call.Method), -1)[0]
@@ -86,7 +87,7 @@ func (call ViewCall) CallData() ([]byte, error) {
 }
 
 func (call ViewCall) MethodCallData() ([]byte, error) {
-	methodParts := strings.Split(strings.ReplaceAll(call.Method, " ", ""), ")(")
+	methodParts := strings.Split(uintMatch.ReplaceAllString(strings.ReplaceAll(call.Method, " ", ""), "uint256"), ")(")
 	var method string
 	if len(methodParts) > 1 {
 		method = fmt.Sprintf("%s)", methodParts[0])
