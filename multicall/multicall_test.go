@@ -87,3 +87,24 @@ func TestTransfer(t *testing.T) {
 	result := decode0[0].(bool)
 	fmt.Println(result)
 }
+
+func TestCallContract(t *testing.T) {
+	ethClient, _ := ethclient.DialContext(context.Background(), "ws://10.136.0.32:9546")
+	vc := multicall.NewViewCall(
+		"0",
+		"0x5c79a60e185ff8b3F89675EB6bC764aE86f06409",
+		"swap(uint,uint,address[],address[])(uint,uint)",
+		[]interface{}{1000, 0, []common.Address{common.HexToAddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"), common.HexToAddress("0x7fc4c11d0d24c88f0d404b2027531eafe77aa701")}, []common.Address{common.HexToAddress("0x7fc4c11d0d24c88f0d404b2027531eafe77aa701"), common.HexToAddress("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c")}},
+	)
+	callData, _ := vc.CallData()
+	fmt.Println(hexutil.Encode(callData))
+	to := common.HexToAddress(vc.Target)
+	msg := ethereum.CallMsg{From: common.HexToAddress("0xFfb47FfA97bF2f4FE09B7b822bEB6e9a0D77e3EF"), To: &to, Gas: 90000, GasPrice: big.NewInt(5000000000), Value: big.NewInt(0), Data: callData}
+	bs0, err := ethClient.CallContract(context.Background(), msg, nil)
+	if err != nil {
+		t.Fatal("call: ", err)
+	}
+	decode0, _ := vc.Decode(bs0)
+	result := decode0[0].(bool)
+	fmt.Println(result)
+}
